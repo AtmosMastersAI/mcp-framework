@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { CreateMessageRequest, CreateMessageResult, Tool as SDKTool } from '@modelcontextprotocol/sdk/types.js';
+import { CreateMessageRequest, CreateMessageResult, ElicitRequest, ElicitResult, Tool as SDKTool } from '@modelcontextprotocol/sdk/types.js';
 import { ImageContent } from '../transports/utils/image-handler.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js';
@@ -125,6 +125,17 @@ export abstract class MCPTool<TInput extends Record<string, any> = any, TSchema 
       throw new Error(`Server reference has not been injected into '${this.name}' tool.`);
     }
     return await this.server.createMessage(request, options);
+  };
+
+  /**
+   * Submit an elicitation request to the client
+   * 
+   */
+  public readonly elicitationRequest = async (request: ElicitRequest['params'], options?: RequestOptions): Promise<ElicitResult> => {
+    if (!this.server) {
+      throw new Error(`Server reference has not been injected into '${this.name}' tool.`);
+    }
+    return await this.server.elicitInput(request, options);
   };
 
   /**

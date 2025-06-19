@@ -2,13 +2,14 @@ import { describe, it, expect, beforeEach, jest } from '@jest/globals';
 import { z } from 'zod';
 import { MCPTool } from '../../src/tools/BaseTool.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-import { CreateMessageRequest, CreateMessageResult } from '@modelcontextprotocol/sdk/types.js';
+import { CreateMessageRequest, CreateMessageResult, ElicitRequest, ElicitResult } from '@modelcontextprotocol/sdk/types.js';
 import {RequestOptions} from '@modelcontextprotocol/sdk/shared/protocol.js';
 
 // Mock the Server class
 jest.mock('@modelcontextprotocol/sdk/server/index.js', () => ({
   Server: jest.fn().mockImplementation(() => ({
     createMessage: jest.fn(),
+    elicitInput: jest.fn(),
   })),
 }));
 
@@ -498,8 +499,51 @@ describe('BaseTool', () => {
       console.log(JSON.stringify(definition, null, 2));
     });
   });
-
   describe('Sampling Functionality', () => {
+    // Common test objects
+    const MOCK_SAMPLING_RESULT: CreateMessageResult = {
+      model: 'test-model',
+      role: 'assistant',
+      content: { type: 'text', text: 'Sampled response' },
+    };
+
+    const BASIC_SAMPLING_REQUEST: CreateMessageRequest['params'] = {
+      messages: [{ role: 'user', content: { type: 'text', text: 'Hello' } }],
+      maxTokens: 100,
+      temperature: 0.7,
+      systemPrompt: 'Be helpful',
+    };
+
+    const COMPLEX_SAMPLING_REQUEST: CreateMessageRequest['params'] = {
+      messages: [
+        { role: 'user', content: { type: 'text', text: 'First message' } },
+        { role: 'assistant', content: { type: 'text', text: 'Assistant response' } },
+        { role: 'user', content: { type: 'text', text: 'Follow up' } },
+      ],
+      maxTokens: 500,
+      temperature: 0.8,
+      systemPrompt: 'You are a helpful assistant',
+      includeContext: 'thisServer',
+      modelPreferences: {
+        hints: [{ name: 'claude-3' }],
+        costPriority: 0.3,
+        speedPriority: 0.7,
+        intelligencePriority: 0.9,
+      },
+      stopSequences: ['END', 'STOP'],
+      metadata: { taskType: 'analysis' },
+    };
+
+    const SAMPLING_REQUEST_OPTIONS: RequestOptions = {
+      timeout: 5000,
+      maxTotalTimeout: 10000,
+      signal: new AbortController().signal,
+      resetTimeoutOnProgress: true,
+      onprogress: (progress) => {
+        console.log('Progress:', progress);
+      },
+    };
+
     class SamplingTool extends MCPTool {
       name = 'sampling_tool';
       description = 'A tool that uses sampling';
@@ -564,24 +608,12 @@ describe('BaseTool', () => {
       });
 
       it('should make sampling requests with correct parameters', async () => {
-        const mockResult: CreateMessageResult = {
-          model: 'test-model',
-          role: 'assistant',
-          content: { type: 'text', text: 'Sampled response' },
-        };
-        mockServer.createMessage.mockResolvedValue(mockResult);
+        mockServer.createMessage.mockResolvedValue(MOCK_SAMPLING_RESULT);
 
-        const request: CreateMessageRequest['params'] = {
-          messages: [{ role: 'user', content: { type: 'text', text: 'Hello' } }],
-          maxTokens: 100,
-          temperature: 0.7,
-          systemPrompt: 'Be helpful',
-        };
+        const result = await samplingTool.samplingRequest(BASIC_SAMPLING_REQUEST);
 
-        const result = await samplingTool.samplingRequest(request);
-
-        expect(mockServer.createMessage).toHaveBeenCalledWith(request, undefined);
-        expect(result).toEqual(mockResult);
+        expect(mockServer.createMessage).toHaveBeenCalledWith(BASIC_SAMPLING_REQUEST, undefined);
+        expect(result).toEqual(MOCK_SAMPLING_RESULT);
       });
 
       it('should handle sampling errors gracefully', async () => {
@@ -596,48 +628,141 @@ describe('BaseTool', () => {
       });
 
       it('should support complex sampling requests with all parameters', async () => {
-        const mockResult: CreateMessageResult = {
+        const complexMockResult: CreateMessageResult = {
           model: 'claude-3-sonnet',
           role: 'assistant',
           content: { type: 'text', text: 'Complex response' },
           stopReason: 'endTurn',
         };
-        mockServer.createMessage.mockResolvedValue(mockResult);
+        mockServer.createMessage.mockResolvedValue(complexMockResult);
 
-        const complexRequest: CreateMessageRequest['params'] = {
-          messages: [
-            { role: 'user', content: { type: 'text', text: 'First message' } },
-            { role: 'assistant', content: { type: 'text', text: 'Assistant response' } },
-            { role: 'user', content: { type: 'text', text: 'Follow up' } },
-          ],
-          maxTokens: 500,
-          temperature: 0.8,
-          systemPrompt: 'You are a helpful assistant',
-          includeContext: 'thisServer',
-          modelPreferences: {
-            hints: [{ name: 'claude-3' }],
-            costPriority: 0.3,
-            speedPriority: 0.7,
-            intelligencePriority: 0.9,
+        const result = await samplingTool.samplingRequest(COMPLEX_SAMPLING_REQUEST, SAMPLING_REQUEST_OPTIONS);
+
+        expect(mockServer.createMessage).toHaveBeenCalledWith(COMPLEX_SAMPLING_REQUEST, SAMPLING_REQUEST_OPTIONS);
+        expect(result).toEqual(complexMockResult);
+      });
+    });
+  });
+  describe('Elicitation Functionality', () => {
+    // Common test objects
+    const MOCK_ELICIT_RESULT: ElicitResult = {
+      action: 'accept',
+    };
+
+    const STANDARD_ELICIT_REQUEST: ElicitRequest['params'] = {
+      message: 'What is your name?',
+      requestedSchema: {
+        type: 'object',
+        properties: {
+          userInput: {
+            type: 'string',
+            description: 'The input provided by the user',
           },
-          stopSequences: ['END', 'STOP'],
-          metadata: { taskType: 'analysis' },
+        },
+      },
+    };
+
+    const STANDARD_REQUEST_OPTIONS = {
+      timeout: 30000,
+      signal: new AbortController().signal,
+    };
+
+    class ElicitationTool extends MCPTool {
+      name = 'elicitation_tool';
+      description = 'A tool that uses elicitation';
+      schema = z.object({
+        question: z.string().describe('The question to elicit input for'),
+      });
+
+      protected async execute(input: { question: string }): Promise<unknown> {
+        const result = await this.elicitationRequest({
+          message: input.question,
+          requestedSchema: STANDARD_ELICIT_REQUEST.requestedSchema,
+        });
+
+        return { userInput: result.value };
+      }
+    }
+
+    let elicitationTool: ElicitationTool;
+    let mockServer: jest.Mocked<Server>;
+
+    beforeEach(() => {
+      elicitationTool = new ElicitationTool();
+      mockServer = new Server(
+        { name: 'test-server', version: '1.0.0' },
+        { capabilities: {} }
+      ) as jest.Mocked<Server>;
+      mockServer.elicitInput = jest.fn();
+    });
+
+    describe('Server Injection for Elicitation', () => {
+      it('should throw error when eliciting without server injection', async () => {
+        await expect(
+          elicitationTool.elicitationRequest(STANDARD_ELICIT_REQUEST)
+        ).rejects.toThrow("Server reference has not been injected into 'elicitation_tool' tool.");
+      });
+    });
+
+    describe('Elicitation Requests', () => {
+      beforeEach(() => {
+        elicitationTool.injectServer(mockServer);
+      });
+
+      it('should make elicitation requests with correct parameters', async () => {
+        mockServer.elicitInput.mockResolvedValue(MOCK_ELICIT_RESULT);
+
+        const result = await elicitationTool.elicitationRequest(STANDARD_ELICIT_REQUEST);
+
+        expect(mockServer.elicitInput).toHaveBeenCalledWith(STANDARD_ELICIT_REQUEST, undefined);
+        expect(result).toEqual(MOCK_ELICIT_RESULT);
+      });
+
+      it('should handle elicitation errors gracefully', async () => {
+        mockServer.elicitInput.mockRejectedValue(new Error('Elicitation failed'));
+        
+        await expect(
+          elicitationTool.elicitationRequest(STANDARD_ELICIT_REQUEST)
+        ).rejects.toThrow('Elicitation failed');
+      });
+
+      it('should support elicitation with request options', async () => {
+        mockServer.elicitInput.mockResolvedValue(MOCK_ELICIT_RESULT);
+
+        const result = await elicitationTool.elicitationRequest(STANDARD_ELICIT_REQUEST, STANDARD_REQUEST_OPTIONS);
+
+        expect(mockServer.elicitInput).toHaveBeenCalledWith(STANDARD_ELICIT_REQUEST, STANDARD_REQUEST_OPTIONS);
+        expect(result).toEqual(MOCK_ELICIT_RESULT);
+      });
+
+      it('should support different schema configurations', async () => {
+        const customRequest: ElicitRequest['params'] = {
+          message: 'Enter multiple values:',
+          requestedSchema: {
+            type: 'object',
+            properties: {
+              name: {
+                type: 'string',
+                description: 'User name',
+              },
+              age: {
+                type: 'number',
+                description: 'User age',
+              },              preferences: {
+                type: 'string',
+                description: 'User preferences as comma-separated values',
+              },
+            },
+            required: ['name'],
+          },
         };
 
-        const options: RequestOptions = {
-          timeout: 5000,
-          maxTotalTimeout: 10000,
-          signal: new AbortController().signal,
-          resetTimeoutOnProgress: true,
-          onprogress: (progress) => {
-            console.log('Progress:', progress);
-          },
-        }
+        mockServer.elicitInput.mockResolvedValue(MOCK_ELICIT_RESULT);
 
-        const result = await samplingTool.samplingRequest(complexRequest, options);
+        const result = await elicitationTool.elicitationRequest(customRequest);
 
-        expect(mockServer.createMessage).toHaveBeenCalledWith(complexRequest, options);
-        expect(result).toEqual(mockResult);
+        expect(mockServer.elicitInput).toHaveBeenCalledWith(customRequest, undefined);
+        expect(result).toEqual(MOCK_ELICIT_RESULT);
       });
     });
   });
