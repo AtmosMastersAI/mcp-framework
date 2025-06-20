@@ -449,6 +449,157 @@ const server = new MCPServer({
 await server.start();
 ```
 
+### Sampling and Elicitation
+
+MCP Framework tools can interact with AI clients through sampling requests (for getting AI responses) and elicitation requests (for prompting users for input). These methods are automatically available in your tools:
+
+#### Sampling
+
+Use `samplingRequest` to get AI-generated responses within your tool:
+
+```typescript
+class AnalysisTool extends MCPTool {
+  name = "analyze_data";
+  description = "Analyze data and generate insights using AI";
+  schema = z.object({
+    data: z.string().describe("Raw data to analyze"),
+    format: z.enum(['summary', 'detailed']).describe("Analysis format")
+  });
+
+  async execute(input: McpInput<this>) {
+    // Request AI analysis of the data
+    const result = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analyze this data and provide a ${input.format} analysis: ${input.data}`
+          }
+        }
+      ],
+      maxTokens: 500,
+      temperature: 0.7
+    });
+
+    return `Analysis: ${result.content.text}`;
+  }
+}
+```
+
+#### Elicitation
+
+Use `elicitationRequest` to prompt users for additional input during tool execution:
+
+```typescript
+class InteractiveTool extends MCPTool {
+  name = "interactive_setup";
+  description = "Interactive tool that prompts user for additional information";
+  schema = z.object({
+    projectName: z.string().describe("Initial project name")
+  });
+
+  async execute(input: McpInput<this>) {
+    // Ask user for additional details
+    const userResponse = await this.elicitationRequest({
+      prompt: `You've started creating project "${input.projectName}". Please provide a description for this project:`,
+      options: {
+        placeholder: "Enter project description..."
+      }
+    });
+
+    // Process with both initial input and user response
+    const projectSetup = {
+      name: input.projectName,
+      description: userResponse.value,
+      createdAt: new Date().toISOString()
+    };
+
+    return `Project created: ${JSON.stringify(projectSetup, null, 2)}`;
+  }
+}
+```
+
+#### Advanced Usage
+
+You can combine both sampling and elicitation for sophisticated interactive workflows:
+
+```typescript
+class SmartAssistantTool extends MCPTool {
+  name = "smart_assistant";
+  description = "Intelligent assistant that can ask for clarification and provide AI-powered responses";
+  schema = z.object({
+    request: z.string().describe("User's initial request")
+  });
+
+  async execute(input: McpInput<this>) {
+    // First, analyze if we need more information
+    const analysis = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analyze this request and determine if you need more information: "${input.request}"`
+          }
+        }
+      ],
+      maxTokens: 200
+    });
+
+    // If AI determines we need more info, ask the user
+    if (analysis.content.text.toLowerCase().includes('need more')) {
+      const clarification = await this.elicitationRequest({
+        prompt: "I need more details to help you better. Could you provide additional context?",
+        options: {
+          placeholder: "Please provide more details..."
+        }
+      });
+
+      // Generate final response with clarification
+      const finalResponse = await this.samplingRequest({
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `Original request: ${input.request}\nAdditional context: ${clarification.value}\nPlease provide a comprehensive response.`
+            }
+          }
+        ],
+        maxTokens: 1000
+      });
+
+      return finalResponse.content.text;
+    }
+
+    // If no clarification needed, respond directly
+    const directResponse = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: input.request
+          }
+        }
+      ],
+      maxTokens: 800
+    });
+
+    return directResponse.content.text;
+  }
+}
+```
+
+**Key Points:**
+- ✅ **Sampling requests** - Get AI-generated responses within your tools
+- ✅ **Elicitation requests** - Prompt users for interactive input
+- ✅ **Async/await support** - Both methods return promises
+- ✅ **Full MCP protocol** - Uses official MCP SDK types and methods
+- ✅ **Error handling** - Methods throw errors if server reference is not injected
+- ✅ **Request options** - Support for temperature, maxTokens, and other parameters
+
 ## Transport Configuration
 
 ### stdio Transport (Default)
