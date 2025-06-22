@@ -1,7 +1,7 @@
 import { IncomingMessage } from "node:http";
 import jwt, { Algorithm } from "jsonwebtoken";
-import { AuthProvider, AuthResult, DEFAULT_AUTH_ERROR } from "../types.js";
-import { logger } from "../../core/Logger.js";
+import { AuthProvider, AuthResult, DEFAULT_AUTH_ERROR } from "@auth/types.js";
+import { logger } from "@core/Logger.js";
 
 /**
  * Configuration options for JWT authentication

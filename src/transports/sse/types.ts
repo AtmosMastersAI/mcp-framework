@@ -1,4 +1,4 @@
-import { AuthConfig } from "../../auth/types.js";
+import { AuthConfig } from "@auth/types.js";
 
 /**
  * CORS configuration options for SSE transport

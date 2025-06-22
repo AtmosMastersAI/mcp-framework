@@ -1,7 +1,6 @@
-
 import { readFile } from "fs/promises";
 import { findUp } from 'find-up';
-import { logger } from "../../core/Logger.js";
+import { logger } from "@core/Logger.js";
 
 
 export async function validateMCPProject() {

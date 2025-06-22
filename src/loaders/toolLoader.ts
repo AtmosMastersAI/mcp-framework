@@ -1,6 +1,6 @@
-import { ToolProtocol } from '../tools/BaseTool.js';
-import { BaseLoader } from './BaseLoader.js';
-import { logger } from '../core/Logger.js';
+import { ToolProtocol } from '@tools/BaseTool.js';
+import { BaseLoader } from '@loaders/BaseLoader.js';
+import { logger } from '@core/Logger.js';
 
 export class ToolLoader extends BaseLoader<ToolProtocol> {
   constructor(basePath?: string) {

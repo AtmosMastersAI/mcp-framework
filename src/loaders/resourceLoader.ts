@@ -1,6 +1,6 @@
-import { ResourceProtocol } from '../resources/BaseResource.js';
-import { BaseLoader } from './BaseLoader.js';
-import { logger } from '../core/Logger.js';
+import { ResourceProtocol } from '@resources/BaseResource.js';
+import { BaseLoader } from '@loaders/BaseLoader.js';
+import { logger } from '@core/Logger.js';
 
 export class ResourceLoader extends BaseLoader<ResourceProtocol> {
   constructor(basePath?: string) {

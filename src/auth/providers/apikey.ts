@@ -1,6 +1,6 @@
 import { IncomingMessage } from "node:http";
-import { logger } from "../../core/Logger.js";
-import { AuthProvider, AuthResult, DEFAULT_AUTH_ERROR } from "../types.js";
+import { logger } from "@core/Logger.js";
+import { AuthProvider, AuthResult, DEFAULT_AUTH_ERROR } from "@auth/types.js";
 
 export const DEFAULT_API_KEY_HEADER_NAME = "X-API-Key"
 /**

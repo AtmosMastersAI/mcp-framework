@@ -3,8 +3,8 @@ import { createServer, IncomingMessage, Server as HttpServer } from "node:http";
 // @ts-ignore: no declaration for 'ws'
 import WebSocket, { WebSocketServer } from "ws";
 import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
-import { AbstractTransport } from "../base.js";
-import { logger } from "../../core/Logger.js";
+import { AbstractTransport } from "@transport/base.js";
+import { logger } from "@core/Logger.js";
 
 interface WebSocketServerTransportConfig {
   port?: number;

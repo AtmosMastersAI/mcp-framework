@@ -1,8 +1,8 @@
 import { join, dirname } from 'path';
 import { pathToFileURL } from 'url';
 import { existsSync } from 'fs';
-import { logger } from '../core/Logger.js';
-import { discoverFilesRecursively, hasValidFiles } from '../utils/fileDiscovery.js';
+import { logger } from '@core/Logger.js';
+import { discoverFilesRecursively, hasValidFiles } from '@utils/fileDiscovery.js';
 
 export interface LoaderConfig {
   subdirectory: string;

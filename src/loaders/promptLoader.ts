@@ -1,6 +1,6 @@
-import { PromptProtocol } from '../prompts/BasePrompt.js';
-import { BaseLoader } from './BaseLoader.js';
-import { logger } from '../core/Logger.js';
+import { PromptProtocol } from '@prompts/BasePrompt.js';
+import { BaseLoader } from '@loaders/BaseLoader.js';
+import { logger } from '@core/Logger.js';
 
 export class PromptLoader extends BaseLoader<PromptProtocol> {
   constructor(basePath?: string) {

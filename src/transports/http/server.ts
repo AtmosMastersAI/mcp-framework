@@ -1,10 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { IncomingMessage, ServerResponse, createServer, Server as HttpServer } from 'node:http';
-import { AbstractTransport } from '../base.js';
+import { AbstractTransport } from '@transport/base.js';
 import { JSONRPCMessage, isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { HttpStreamTransportConfig } from './types.js';
-import { logger } from '../../core/Logger.js';
+import { HttpStreamTransportConfig } from '@transport/http/types.js';
+import { logger } from '@core/Logger.js';
 
 export class HttpStreamTransport extends AbstractTransport {
   readonly type = 'http-stream';

@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import { createProject } from './project/create.js';
-import { addTool } from './project/add-tool.js';
-import { addPrompt } from './project/add-prompt.js';
-import { addResource } from './project/add-resource.js';
-import { buildFramework } from './framework/build.js';
-import { validateCommand } from './commands/validate.js';
+import { createProject } from '@cli/project/create.js';
+import { addTool } from '@cli/project/add-tool.js';
+import { addPrompt } from '@cli/project/add-prompt.js';
+import { addResource } from '@cli/project/add-resource.js';
+import { buildFramework } from '@cli/framework/build.js';
+import { validateCommand } from '@cli/commands/validate.js';
 
 const program = new Command();
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { CreateMessageRequest, CreateMessageResult, ElicitRequest, ElicitResult, Tool as SDKTool } from '@modelcontextprotocol/sdk/types.js';
-import { ImageContent } from '../transports/utils/image-handler.js';
+import { ImageContent } from '@transport/utils/image-handler.js';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { RequestOptions } from '@modelcontextprotocol/sdk/shared/protocol.js';
 

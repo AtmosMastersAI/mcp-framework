@@ -3,13 +3,13 @@ import { IncomingMessage, Server as HttpServer, ServerResponse, createServer } f
 import { JSONRPCMessage, ClientRequest } from "@modelcontextprotocol/sdk/types.js";
 import contentType from "content-type";
 import getRawBody from "raw-body";
-import { APIKeyAuthProvider } from "../../auth/providers/apikey.js";
-import { DEFAULT_AUTH_ERROR } from "../../auth/types.js";
-import { AbstractTransport } from "../base.js";
-import { DEFAULT_SSE_CONFIG, SSETransportConfig, SSETransportConfigInternal, DEFAULT_CORS_CONFIG, CORSConfig } from "./types.js";
-import { logger } from "../../core/Logger.js";
-import { getRequestHeader, setResponseHeaders } from "../../utils/headers.js";
-import { PING_SSE_MESSAGE } from "../utils/ping-message.js";
+import { APIKeyAuthProvider } from "@auth/providers/apikey.js";
+import { DEFAULT_AUTH_ERROR } from "@auth/types.js";
+import { AbstractTransport } from "@transport/base.js";
+import { DEFAULT_SSE_CONFIG, SSETransportConfig, SSETransportConfigInternal, DEFAULT_CORS_CONFIG, CORSConfig } from "@transport/sse/types.js";
+import { logger } from "@core/Logger.js";
+import { getRequestHeader, setResponseHeaders } from "@utils/headers.js";
+import { PING_SSE_MESSAGE } from "@transport/utils/ping-message.js";
 
 
 const SSE_HEADERS = {
