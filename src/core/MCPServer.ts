@@ -56,6 +56,11 @@ export type ServerCapabilities = {
     listChanged?: true;
     subscribe?: true;
   };
+  roots?: {
+    listChanged?: true; // Optional: Indicates support for roots capability
+  };
+  elicitation?: true; // Optional: Indicates support for elicitation capability
+  // Other standard capabilities like 'logging' or 'completion' could be added here if supported
 };
 
 export class MCPServer {

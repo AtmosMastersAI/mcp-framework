@@ -48,7 +48,10 @@ export interface SessionConfig {
 }
 
 /**
- * Configuration interface for the HTTP Stream transport
+ * Configuration options for Streamable HTTP transport that implements the MCP 2025-06-18 spec.
+ * 
+ * This defines the options for a transport that receives messages via HTTP POST and can respond
+ * with either a single JSON response or open an SSE stream for streaming responses.
  */
 export interface HttpStreamTransportConfig {
   /**

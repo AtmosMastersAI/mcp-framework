@@ -1,9 +1,8 @@
 {
-  "name": "@oe/mcp-framework",
+  "name": "@AtmosMastersAI/mcp-framework",
   "version": "0.2.17",
   "description": "Framework for building Model Context Protocol (MCP) servers in Typescript",
   "type": "module",
-  "author": "Alex Andru <alex@andru.codes>",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -49,23 +48,27 @@
     "@modelcontextprotocol/sdk": "^1.13.0"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "@types/prompts": "^2.4.9",
     "commander": "^12.1.0",
     "content-type": "^1.0.5",
+    "dotenv": "^16.4.7",
     "execa": "^9.5.2",
     "find-up": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
     "prompts": "^2.4.2",
     "raw-body": "^2.5.2",
     "typescript": "^5.3.3",
+    "ws": "^8.18.1",
     "zod": "^3.23.8"
   },
   "devDependencies": {
     "@eslint/js": "^9.23.0",
     "@types/content-type": "^1.1.8",
+    "@types/express": "^5.0.1",
     "@types/jest": "^29.5.12",
     "@types/jsonwebtoken": "^9.0.8",
-    "@types/node": "^20.17.28",
+    "@types/node": "^20.17.30",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",

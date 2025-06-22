@@ -2,6 +2,8 @@
 
 MCP-Framework is a framework for building Model Context Protocol (MCP) servers elegantly in TypeScript.
 
+This release targets the [MCP specification version 2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18), introducing support for new client features like **Roots** (a mechanism for defining entry points in the model context) and **Elicitation** (a way to prompt users for additional information during tool execution).
+
 MCP-Framework gives you architecture out of the box, with automatic directory-based discovery for tools, resources, and prompts. Use our powerful MCP abstractions to define tools, resources, or prompts in an elegant way. Our cli makes getting started with your own MCP server a breeze
 
 ## Features
@@ -13,6 +15,42 @@ MCP-Framework gives you architecture out of the box, with automatic directory-ba
 - Easy-to-use base classes for tools, prompts, and resources
 - Out of the box authentication for SSE endpoints
 
+### Purpose
+
+- Facilitate communication with an MCP server from your application.
+- Support multiple transports seamlessly.
+- Simplify sending commands, receiving responses, and handling streaming data.
+
+### Typical Usage
+
+```typescript
+import { MCPClient } from "mcp-framework";
+
+const client = new MCPClient({
+  transport: {
+    type: "websocket",
+    options: {
+      url: "ws://localhost:8080/ws" // Your WebSocket endpoint
+    }
+  }
+});
+
+// Connect to the server
+await client.connect();
+
+// Send a request
+const response = await client.send({
+  tool: "example_tool",
+  input: { message: "Hello MCP" }
+});
+
+console.log("Response:", response);
+
+// Disconnect when done
+await client.disconnect();
+```
+
+`MCPClient` can be configured to use other transports like SSE, HTTP, or stdio by changing the `transport` type and options.
 ## Projects Built with MCP Framework
 
 The following projects and services are built using MCP Framework:
@@ -636,6 +674,53 @@ const server = new MCPServer({
     }
   }
 });
+### WebSockets Transport
+
+The WebSockets transport enables full-duplex, low-latency communication between `MCPClient` and the MCP server. It is ideal for interactive applications requiring real-time updates or bidirectional messaging.
+
+#### Benefits
+
+- Persistent connection with low overhead.
+- Real-time, bidirectional communication.
+- Efficient for streaming data and interactive workflows.
+- Supports multiplexing multiple requests/responses over a single connection.
+
+#### Integration with MCP Client
+
+To use WebSockets, configure the `MCPClient` with the `websocket` transport type and specify the server URL:
+
+```typescript
+const client = new MCPClient({
+  transport: {
+    type: "websocket",
+    options: {
+      url: "ws://localhost:8080/ws"
+    }
+  }
+});
+await client.connect();
+```
+
+On the server side, enable the WebSockets transport:
+
+```typescript
+import { MCPServer } from "mcp-framework";
+
+const server = new MCPServer({
+  transport: {
+    type: "websocket",
+    options: {
+      port: 8080,
+      path: "/ws" // default or custom WebSocket path
+    }
+  }
+});
+
+await server.start();
+```
+
+This setup allows the client and server to communicate efficiently over WebSockets.
+
 ```
 
 ### HTTP Stream Transport
