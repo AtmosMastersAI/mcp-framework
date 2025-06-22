@@ -1,5 +1,5 @@
 import { StdioServerTransport as SDKStdioTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { BaseTransport } from "../base.js";
+import { BaseTransport } from "@transport/base.js";
 import { JSONRPCMessage } from "@modelcontextprotocol/sdk/types.js";
 import {
   ImageTransportOptions,
@@ -7,8 +7,8 @@ import {
   hasImageContent,
   prepareImageForTransport,
   ImageContent
-} from "../utils/image-handler.js";
-import { logger } from "../../core/Logger.js";
+} from "@transport/utils/image-handler.js";
+import { logger } from "@core/Logger.js";
 
 type ExtendedJSONRPCMessage = JSONRPCMessage & {
   result?: {

@@ -1,19 +1,9 @@
 {
-  "name": "@AtmosMastersAI/mcp-framework",
-  "version": "0.2.17",
-  "description": "Framework for building Model Context Protocol (MCP) servers in Typescript",
+  "name": "mcp-framework-boilerplate",
+  "version": "1.0.0",
+  "description": "Boilerplate for building Model Context Protocol (MCP) servers in TypeScript with path aliases",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
+  "private": true,
   "bin": {
     "mcp": "dist/cli/index.js",
     "mcp-build": "dist/cli/framework/build-cli.js"
@@ -24,10 +14,13 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "prepare": "npm run build",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "dev": "npm run build && npm run start",
+    "start": "node dist/index.js",
+    "mcp": "node dist/cli/index.js",
+    "mcp-build": "node dist/cli/framework/build-cli.js"
   },
   "engines": {
     "node": ">=18.19.0"
@@ -44,10 +37,8 @@
     "context",
     "protocol"
   ],
-  "peerDependencies": {
-    "@modelcontextprotocol/sdk": "^1.13.0"
-  },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.13.0",
     "@anthropic-ai/sdk": "^0.39.0",
     "@types/prompts": "^2.4.9",
     "commander": "^12.1.0",

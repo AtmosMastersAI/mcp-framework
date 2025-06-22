@@ -2,7 +2,7 @@ import { spawnSync } from 'child_process';
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import prompts from 'prompts';
-import { generateReadme } from '../templates/readme.js';
+import { generateReadme } from '@cli/templates/readme.js';
 import { execa } from 'execa';
 
 export async function createProject(

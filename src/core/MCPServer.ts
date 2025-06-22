@@ -10,23 +10,23 @@ import {
   SubscribeRequestSchema,
   UnsubscribeRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { ToolProtocol } from '../tools/BaseTool.js';
-import { PromptProtocol } from '../prompts/BasePrompt.js';
-import { ResourceProtocol } from '../resources/BaseResource.js';
+import { ToolProtocol } from '@tools/BaseTool.js';
+import { PromptProtocol } from '@prompts/BasePrompt.js';
+import { ResourceProtocol } from '@resources/BaseResource.js';
 import { readFileSync } from 'fs';
 import { join, resolve, dirname } from 'path';
-import { logger } from './Logger.js';
-import { ToolLoader } from '../loaders/toolLoader.js';
-import { PromptLoader } from '../loaders/promptLoader.js';
-import { ResourceLoader } from '../loaders/resourceLoader.js';
-import { BaseTransport } from '../transports/base.js';
-import { StdioServerTransport } from '../transports/stdio/server.js';
-import { SSEServerTransport } from '../transports/sse/server.js';
-import { SSETransportConfig, DEFAULT_SSE_CONFIG } from '../transports/sse/types.js';
-import { HttpStreamTransport } from '../transports/http/server.js';
-import { HttpStreamTransportConfig, DEFAULT_HTTP_STREAM_CONFIG } from '../transports/http/types.js';
-import { DEFAULT_CORS_CONFIG } from '../transports/sse/types.js';
-import { AuthConfig } from '../auth/types.js';
+import { logger } from '@core/Logger.js';
+import { ToolLoader } from '@loaders/toolLoader.js';
+import { PromptLoader } from '@loaders/promptLoader.js';
+import { ResourceLoader } from '@loaders/resourceLoader.js';
+import { BaseTransport } from '@transport/base.js';
+import { StdioServerTransport } from '@transport/stdio/server.js';
+import { SSEServerTransport } from '@transport/sse/server.js';
+import { SSETransportConfig, DEFAULT_SSE_CONFIG } from '@transport/sse/types.js';
+import { HttpStreamTransport } from '@transport/http/server.js';
+import { HttpStreamTransportConfig, DEFAULT_HTTP_STREAM_CONFIG } from '@transport/http/types.js';
+import { DEFAULT_CORS_CONFIG } from '@transport/sse/types.js';
+import { AuthConfig } from '@auth/types.js';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -544,5 +544,29 @@ export class MCPServer {
 
   get IsRunning(): boolean {
     return this.isRunning;
+  }
+
+  /**
+   * Add a tool to the server
+   */
+  addTool(tool: ToolProtocol): void {
+    this.toolsMap.set(tool.name, tool);
+    logger.debug(`Added tool: ${tool.name}`);
+  }
+
+  /**
+   * Add a prompt to the server
+   */
+  addPrompt(prompt: PromptProtocol): void {
+    this.promptsMap.set(prompt.name, prompt);
+    logger.debug(`Added prompt: ${prompt.name}`);
+  }
+
+  /**
+   * Add a resource to the server
+   */
+  addResource(resource: ResourceProtocol): void {
+    this.resourcesMap.set(resource.uri, resource);
+    logger.debug(`Added resource: ${resource.name} (${resource.uri})`);
   }
 }

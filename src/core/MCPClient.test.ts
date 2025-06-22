@@ -1,4 +1,4 @@
-import { MCPClient, MCPClientConfig } from './MCPClient';
+import { MCPClient, MCPClientConfig } from '@core/MCPClient.js';
 import { describe, test, expect, jest, beforeEach, afterEach, afterAll } from '@jest/globals';
 import { createInterface } from 'readline/promises';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';

@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
-import { logger } from '../core/Logger.js';
+import { logger } from '@core/Logger.js';
 
 export interface FileDiscoveryOptions {
   extensions?: string[];

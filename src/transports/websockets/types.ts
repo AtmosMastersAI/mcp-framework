@@ -1,6 +1,6 @@
-import { AuthConfig } from "../../auth/types.js";
+import { AuthConfig } from "@auth/types.js";
 import type { Server as HTTPServer } from "http";
-import type { CORSConfig } from "../sse/types.js";
+import type { CORSConfig } from "@transport/sse/types.js";
 
 /**
  * Configuration options for WebSocket server transport
@@ -58,4 +58,3 @@ export const DEFAULT_WEBSOCKET_CONFIG: WebSocketServerTransportConfigInternal = 
   port: 8080,
   path: "/ws"
 };
-

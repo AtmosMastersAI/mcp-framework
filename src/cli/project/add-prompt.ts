@@ -1,8 +1,8 @@
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import prompts from "prompts";
-import { toPascalCase } from "../utils/string-utils.js";
-import { validateMCPProject } from "../utils/validate-project.js";
+import { toPascalCase } from "@cli/utils/string-utils.js";
+import { validateMCPProject } from "@cli/utils/validate-project.js";
 
 export async function addPrompt(name?: string) {
   await validateMCPProject();
