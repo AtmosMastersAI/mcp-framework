@@ -8,8 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 
-* Add detailed usage examples and explanation for `MCPClient`.
-* Document WebSockets transport support and configuration.
+* Add detailed usage examples and explanation for `MCPClient`, focusing on new transport configurations.
+* Document WebSockets transport support and configuration, including details on setting up the server and client.
 
 
 ## [0.2.15](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.14...mcp-framework-v0.2.15) (2025-06-18)
