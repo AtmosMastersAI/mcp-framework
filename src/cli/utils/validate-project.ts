@@ -13,11 +13,11 @@ export async function validateMCPProject() {
     }
     const package_json = JSON.parse(await readFile(packageJsonPath, "utf-8"));
     if (
-      !package_json.dependencies?.["mcp-framework"] &&
-      !package_json.devDependencies?.["mcp-framework"]
+      !package_json.dependencies?.["@oe/mcp-framework"] &&
+      !package_json.devDependencies?.["@oe/mcp-framework"]
     ) {
       throw new Error(
-        "This directory is not an MCP project (mcp-framework not found in dependencies or devDependencies)"
+        "This directory is not an MCP project (@oe/mcp-framework not found in dependencies or devDependencies)"
       );
     }
   } catch (error) {

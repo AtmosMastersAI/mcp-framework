@@ -12,6 +12,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Document WebSockets transport support and configuration.
 
 
+## [0.2.15](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.14...mcp-framework-v0.2.15) (2025-06-18)
+
+
+### Bug Fixes
+
+* http transport uses same tool loading ([0d0a8d8](https://github.com/QuantGeekDev/mcp-framework/commit/0d0a8d898b03acc722d88683eee9895bfbe5b518))
+* http transport uses same tool loading ([7ff3c11](https://github.com/QuantGeekDev/mcp-framework/commit/7ff3c115506394b2589a7bac2fa81e9401682f7b))
+
+## [0.2.14](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.13...mcp-framework-v0.2.14) (2025-06-16)
+
+
+### Features
+
+* add .gitignore on project creation ([f8b6ea6](https://github.com/QuantGeekDev/mcp-framework/commit/f8b6ea6f8ce8e51471004c05778516b71d1f0235))
+* add .gitignore on project creation ([87ed7de](https://github.com/QuantGeekDev/mcp-framework/commit/87ed7de1816dd8c93be7245a8ede636ee8d300c7))
+* add BaseLoader ([b725f84](https://github.com/QuantGeekDev/mcp-framework/commit/b725f844b25bf9da13018c758f0efc347fe6f91b))
+* add license ([53cfb2e](https://github.com/QuantGeekDev/mcp-framework/commit/53cfb2ebe6d5120da99b906a7f91bb7f6b74b863))
+* add license ([a88663a](https://github.com/QuantGeekDev/mcp-framework/commit/a88663a45f9cecd86e039d6fc2eca85035776c65))
+* add nested tool loading ([5fb42e6](https://github.com/QuantGeekDev/mcp-framework/commit/5fb42e683b74de3376f47343ca91548c8ffbe1a3))
+* add new tool abstraction ([b12fd17](https://github.com/QuantGeekDev/mcp-framework/commit/b12fd17a3daf5bd1299c73e229240a5e614969c5))
+* add support for nested automatic discovery ([a0c3dff](https://github.com/QuantGeekDev/mcp-framework/commit/a0c3dffb58183a71995eb739bfb5ee731a912fe3))
+* refactor SSE transport for multiple connections and add prepare script ([30fc864](https://github.com/QuantGeekDev/mcp-framework/commit/30fc8643ee74457f1bfc2cabb706a05e296b832d))
+* update gitignore ([1823548](https://github.com/QuantGeekDev/mcp-framework/commit/1823548099b75b6a0b2a6eb991134b15c0077dd6))
+* update tool abstraction in README ([0c40512](https://github.com/QuantGeekDev/mcp-framework/commit/0c40512d27ed238d563f0401886d0f21e342563a))
+
+
+### Bug Fixes
+
+* concurrency ([484e3db](https://github.com/QuantGeekDev/mcp-framework/commit/484e3dbe029efa037193a6bc68400523a1c36c21))
+* gitignore indent ([4e03fa3](https://github.com/QuantGeekDev/mcp-framework/commit/4e03fa3043ba0b6179f73a725946b6c40a2449f0))
+* gitignore indent ([69e7afa](https://github.com/QuantGeekDev/mcp-framework/commit/69e7afad8b80d420fe19d56d5028548986dc0674))
+* multi client ([effbb13](https://github.com/QuantGeekDev/mcp-framework/commit/effbb131ae315c97b2d96f96f945f9bd11e51cfb))
+* multi client ([4019e11](https://github.com/QuantGeekDev/mcp-framework/commit/4019e11d6c48153bb80838469cfc994a46862ba2))
+* phantom ping issue ([7f4b423](https://github.com/QuantGeekDev/mcp-framework/commit/7f4b423e22fad3b1a0b39c9fade649fa45c36bbb))
+* phantom ping issue ([a0ef753](https://github.com/QuantGeekDev/mcp-framework/commit/a0ef7530dc4a9b310514d7559f0980bd4ba2f7da))
+* recursive loading ([5b3208f](https://github.com/QuantGeekDev/mcp-framework/commit/5b3208f5e6471c0e937e6524d58727f870e865d8))
+* recursive loading ([a34bc6a](https://github.com/QuantGeekDev/mcp-framework/commit/a34bc6a79cd8d3c920bb8ea46359dce742acb8f7))
+* update tool loader pathing ([5151aff](https://github.com/QuantGeekDev/mcp-framework/commit/5151aff51db516f7c3673fb7d28f3b27173cb533))
+* update tool loader pathing ([f048ecd](https://github.com/QuantGeekDev/mcp-framework/commit/f048ecdad8a23c517f4786dd7f4568e2a4c84845))
+
+## [0.2.13](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.12...mcp-framework-v0.2.13) (2025-05-23)
+
+
+### Bug Fixes
+
+* properly support required/optional tool input schema ([1583603](https://github.com/QuantGeekDev/mcp-framework/commit/1583603b2613b8c7c57ebbd52fb5c8159d0b8d13))
+
+## [0.2.12](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.11...mcp-framework-v0.2.12) (2025-05-23)
+
+
+### Features
+
+* bump mcp ts sdk version ([d9cc845](https://github.com/QuantGeekDev/mcp-framework/commit/d9cc8450d39e89f36e39e78bb4d1946cf5f858d3))
+* enhanced cursor rule with example ([d3b54d4](https://github.com/QuantGeekDev/mcp-framework/commit/d3b54d4619e669ad322484b074a82aae27d61ae9))
+* replace custom implementation with sdk delegation ([1b5b8e7](https://github.com/QuantGeekDev/mcp-framework/commit/1b5b8e7cbe354056856a565b21b8908eb93ac2ba))
+
 ## [0.2.11](https://github.com/QuantGeekDev/mcp-framework/compare/mcp-framework-v0.2.10...mcp-framework-v0.2.11) (2025-03-30)
 
 

@@ -51,6 +51,20 @@ await client.disconnect();
 ```
 
 `MCPClient` can be configured to use other transports like SSE, HTTP, or stdio by changing the `transport` type and options.
+## Projects Built with MCP Framework
+
+The following projects and services are built using MCP Framework:
+
+- ### [tip.md](https://tip.md)
+A crypto tipping service that enables AI assistants to help users send cryptocurrency tips to content creators directly from their chat interface. The MCP service allows for:
+ - Checking wallet types for users
+ - Preparing cryptocurrency tips for users/agents to complete
+Setup instructions for various clients (Cursor, Sage, Claude Desktop) are available in their [MCP Server documentation](https://docs.tip.md/mcp-server/).
+
+## Support our work
+
+[![Tip in Crypto](https://tip.md/badge.svg)](https://tip.md/QuantGeekDev)
+
 
 # [Read the full docs here](https://mcp-framework.com)
 
@@ -102,6 +116,52 @@ mcp create <your project name here> --http --port 1337 --cors
 mcp add tool price-fetcher
 ```
 
+### Building and Validation
+
+The framework provides comprehensive validation to ensure your tools are properly documented and functional:
+
+```bash
+# Build with automatic validation (recommended)
+npm run build
+
+# Build with custom validation settings
+MCP_SKIP_TOOL_VALIDATION=false npm run build  # Force validation (default)
+MCP_SKIP_TOOL_VALIDATION=true npm run build   # Skip validation (not recommended)
+```
+
+### Validating Tools
+
+```bash
+# Validate all tools have proper descriptions (for Zod schemas)
+mcp validate
+```
+
+This command checks that all tools using Zod schemas have descriptions for every field. The validation runs automatically during build, but you can also run it standalone:
+
+- ✅ **During build**: `npm run build` automatically validates tools
+- ✅ **Standalone**: `mcp validate` for manual validation
+- ✅ **Development**: Use `defineSchema()` helper for immediate feedback
+- ✅ **Runtime**: Server validates tools on startup
+
+**Example validation error:**
+```bash
+❌ Tool validation failed:
+  ❌ PriceFetcher.js: Missing descriptions for fields in price_fetcher: symbol, currency. 
+All fields must have descriptions when using Zod object schemas. 
+Use .describe() on each field, e.g., z.string().describe("Field description")
+```
+
+**Integrating validation into CI/CD:**
+```json
+{
+  "scripts": {
+    "build": "tsc && mcp-build",
+    "test": "jest && mcp validate",
+    "prepack": "npm run build && mcp validate"
+  }
+}
+```
+
 ### Adding a Prompt
 
 ```bash
@@ -118,29 +178,66 @@ mcp add resource market-data
 
 ## Development Workflow
 
-1. Create your project:
+1. **Create your project:**
+   ```bash
+   mcp create my-mcp-server
+   cd my-mcp-server
+   ```
 
-```bash
-  mcp create my-mcp-server
-  cd my-mcp-server
-```
-
-2. Add tools as needed:
-
+2. **Add tools:**
    ```bash
    mcp add tool data-fetcher
    mcp add tool data-processor
    mcp add tool report-generator
    ```
 
-3. Build:
+3. **Define your tool schemas with automatic validation:**
+   ```typescript
+   // tools/DataFetcher.ts
+   import { MCPTool, MCPInput as AddToolInput } from "mcp-framework";
+  import { z } from "zod";
 
-   ```bash
-   npm run build
+  const AddToolSchema = z.object({
+  a: z.number().describe("First number to add"),
+  b: z.number().describe("Second number to add"),
+  });
+
+  class AddTool extends MCPTool {
+  name = "add";
+  description = "Add tool description";
+  schema = AddToolSchema;
+
+  async execute(input: AddToolInput<this>) {
+    const result = input.a + input.b;
+    return `Result: ${result}`;
+    }
+  }
+  export default AddTool;
 
    ```
 
-4. Add to MCP Client (Read below for Claude Desktop example)
+4. **Build with automatic validation:**
+   ```bash
+   npm run build  # Automatically validates schemas and compiles
+   ```
+
+5. **Optional: Run standalone validation:**
+   ```bash
+   mcp validate  # Check all tools independently
+   ```
+
+6. **Test your server:**
+   ```bash
+   node dist/index.js  # Server validates tools on startup
+   ```
+
+7. **Add to MCP Client** (see Claude Desktop example below)
+
+**Pro Tips:**
+- Use `defineSchema()` during development for immediate feedback
+- Build process automatically catches missing descriptions
+- Server startup validates all tools before accepting connections
+- Use TypeScript's autocomplete with `McpInput<this>` for better DX
 
 ## Using with Claude Desktop
 
@@ -148,8 +245,8 @@ mcp add resource market-data
 
 Add this configuration to your Claude Desktop config file:
 
-**MacOS**: \`~/Library/Application Support/Claude/claude_desktop_config.json\`
-**Windows**: \`%APPDATA%/Claude/claude_desktop_config.json\`
+**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -166,8 +263,8 @@ Add this configuration to your Claude Desktop config file:
 
 Add this configuration to your Claude Desktop config file:
 
-**MacOS**: \`~/Library/Application Support/Claude/claude_desktop_config.json\`
-**Windows**: \`%APPDATA%/Claude/claude_desktop_config.json\`
+**MacOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+**Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -183,7 +280,7 @@ Add this configuration to your Claude Desktop config file:
 ## Building and Testing
 
 1. Make changes to your tools
-2. Run \`npm run build\` to compile
+2. Run `npm run build` to compile
 3. The server will automatically load your tools on startup
 
 ## Environment Variables
@@ -203,39 +300,170 @@ Example usage:
 MCP_ENABLE_FILE_LOGGING=true node dist/index.js
 
 # Specify a custom log directory
-MCP_ENABLE_FILE_LOGGING=true MCP_LOG_DIRECTORY=my-logs
+MCP_ENABLE_FILE_LOGGING=true MCP_LOG_DIRECTORY=my-logs node dist/index.js
+
 # Enable debug messages in console
-MCP_DEBUG_CONSOLE=true```
+MCP_DEBUG_CONSOLE=true node dist/index.js
+```
 
 ## Quick Start
 
-### Creating a Tool
+### Defining Tools
+
+MCP Framework uses Zod schemas for defining tool inputs, providing type safety, validation, and automatic documentation:
 
 ```typescript
-import { MCPTool } from "mcp-framework";
+import { MCPTool, McpInput } from "mcp-framework";
 import { z } from "zod";
 
-interface ExampleInput {
-  message: string;
-}
+const AddToolSchema = z.object({
+  a: z.number().describe("First number to add"),
+  b: z.number().describe("Second number to add"),
+});
 
-class ExampleTool extends MCPTool<ExampleInput> {
-  name = "example_tool";
-  description = "An example tool that processes messages";
+class AddTool extends MCPTool {
+  name = "add";
+  description = "Add tool description";
+  schema = AddToolSchema;
 
-  schema = {
-    message: {
-      type: z.string(),
-      description: "Message to process",
-    },
-  };
-
-  async execute(input: ExampleInput) {
-    return `Processed: ${input.message}`;
+  async execute(input: McpInput<this>) {
+    const result = input.a + input.b;
+    return `Result: ${result}`;
   }
 }
 
-export default ExampleTool;
+export default AddTool;
+```
+
+**Key Benefits:**
+- ✅ **Single source of truth** - Define types and validation in one place
+- ✅ **Automatic type inference** - TypeScript types are inferred from your schema
+- ✅ **Rich validation** - Leverage Zod's powerful validation features
+- ✅ **Required descriptions** - Framework enforces documentation
+- ✅ **Better IDE support** - Full autocomplete and type checking
+- ✅ **Cleaner code** - No duplicate type definitions
+
+### Advanced Zod Schema Features
+
+The framework supports all Zod features:
+
+```typescript
+import { MCPTool, McpInput } from "mcp-framework";
+import { z } from "zod";
+
+const AdvancedSchema = z.object({
+  // String constraints and formats
+  email: z.string().email().describe("User email address"),
+  name: z.string().min(2).max(50).describe("User name"),
+  website: z.string().url().optional().describe("Optional website URL"),
+  
+  // Number constraints
+  age: z.number().int().positive().max(120).describe("User age"),
+  rating: z.number().min(1).max(5).describe("Rating from 1 to 5"),
+  
+  // Arrays and objects
+  tags: z.array(z.string()).describe("List of tags"),
+  metadata: z.object({
+    priority: z.enum(['low', 'medium', 'high']).describe("Task priority"),
+    dueDate: z.string().optional().describe("Due date in ISO format")
+  }).describe("Additional metadata"),
+  
+  // Default values
+  status: z.string().default('pending').describe("Current status"),
+  
+  // Unions and enums
+  category: z.union([
+    z.literal('personal'),
+    z.literal('work'),
+    z.literal('other')
+  ]).describe("Category type")
+});
+
+class AdvancedTool extends MCPTool {
+  name = "advanced_tool";
+  description = "Tool demonstrating advanced Zod features";
+  schema = AdvancedSchema;
+
+  async execute(input: McpInput<this>) {
+    // TypeScript automatically knows all the types!
+    const { email, name, website, age, rating, tags, metadata, status, category } = input;
+    
+    console.log(input.name.toUpperCase()); // ✅ TypeScript knows this is valid
+    console.log(input.age.toFixed(2));     // ✅ Number methods available
+    console.log(input.tags.length);       // ✅ Array methods available
+    console.log(input.website?.includes("https")); // ✅ Optional handling
+    
+    return `Processed user: ${name}`;
+  }
+}
+```
+
+### Automatic Type Inference
+
+The `McpInput<this>` type automatically infers the correct input type from your schema, eliminating the need for manual type definitions:
+
+```typescript
+class MyTool extends MCPTool {
+  schema = z.object({
+    name: z.string().describe("User name"),
+    age: z.number().optional().describe("User age"),
+    tags: z.array(z.string()).describe("User tags")
+  });
+
+  async execute(input: McpInput<this>) {
+    // TypeScript automatically knows:
+    // input.name is string
+    // input.age is number | undefined  
+    // input.tags is string[]
+    
+    console.log(input.name.toUpperCase()); // ✅ TypeScript knows this is valid
+    console.log(input.age?.toFixed(2));    // ✅ Handles optional correctly
+    console.log(input.tags.length);       // ✅ Array methods available
+  }
+}
+```
+
+No more duplicate interfaces or generic type parameters needed!
+
+### Schema Validation & Descriptions
+
+**All schema fields must have descriptions**. This ensures your tools are well-documented and provides better user experience in MCP clients.
+
+The framework validates descriptions at multiple levels:
+
+#### 1. Build-time Validation (Recommended)
+```bash
+npm run build  # Automatically validates during compilation
+```
+
+#### 2. Development-time Validation
+Use the `defineSchema` helper for immediate feedback:
+
+```typescript
+import { defineSchema } from "mcp-framework";
+
+// This will throw an error immediately if descriptions are missing
+const MySchema = defineSchema({
+  name: z.string(),  // ❌ Error: Missing description
+  age: z.number().describe("User age")  // ✅ Good
+});
+```
+
+#### 3. Standalone Validation
+```bash
+mcp validate  # Check all tools for proper descriptions
+```
+
+#### 4. Runtime Validation
+The server automatically validates tools on startup.
+
+**To skip validation** (not recommended):
+```bash
+# Skip during build
+MCP_SKIP_TOOL_VALIDATION=true npm run build
+
+# Skip during development
+NODE_ENV=production npm run dev
 ```
 
 ### Setting up the Server
@@ -258,6 +486,157 @@ const server = new MCPServer({
 // Start the server
 await server.start();
 ```
+
+### Sampling and Elicitation
+
+MCP Framework tools can interact with AI clients through sampling requests (for getting AI responses) and elicitation requests (for prompting users for input). These methods are automatically available in your tools:
+
+#### Sampling
+
+Use `samplingRequest` to get AI-generated responses within your tool:
+
+```typescript
+class AnalysisTool extends MCPTool {
+  name = "analyze_data";
+  description = "Analyze data and generate insights using AI";
+  schema = z.object({
+    data: z.string().describe("Raw data to analyze"),
+    format: z.enum(['summary', 'detailed']).describe("Analysis format")
+  });
+
+  async execute(input: McpInput<this>) {
+    // Request AI analysis of the data
+    const result = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analyze this data and provide a ${input.format} analysis: ${input.data}`
+          }
+        }
+      ],
+      maxTokens: 500,
+      temperature: 0.7
+    });
+
+    return `Analysis: ${result.content.text}`;
+  }
+}
+```
+
+#### Elicitation
+
+Use `elicitationRequest` to prompt users for additional input during tool execution:
+
+```typescript
+class InteractiveTool extends MCPTool {
+  name = "interactive_setup";
+  description = "Interactive tool that prompts user for additional information";
+  schema = z.object({
+    projectName: z.string().describe("Initial project name")
+  });
+
+  async execute(input: McpInput<this>) {
+    // Ask user for additional details
+    const userResponse = await this.elicitationRequest({
+      prompt: `You've started creating project "${input.projectName}". Please provide a description for this project:`,
+      options: {
+        placeholder: "Enter project description..."
+      }
+    });
+
+    // Process with both initial input and user response
+    const projectSetup = {
+      name: input.projectName,
+      description: userResponse.value,
+      createdAt: new Date().toISOString()
+    };
+
+    return `Project created: ${JSON.stringify(projectSetup, null, 2)}`;
+  }
+}
+```
+
+#### Advanced Usage
+
+You can combine both sampling and elicitation for sophisticated interactive workflows:
+
+```typescript
+class SmartAssistantTool extends MCPTool {
+  name = "smart_assistant";
+  description = "Intelligent assistant that can ask for clarification and provide AI-powered responses";
+  schema = z.object({
+    request: z.string().describe("User's initial request")
+  });
+
+  async execute(input: McpInput<this>) {
+    // First, analyze if we need more information
+    const analysis = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: `Analyze this request and determine if you need more information: "${input.request}"`
+          }
+        }
+      ],
+      maxTokens: 200
+    });
+
+    // If AI determines we need more info, ask the user
+    if (analysis.content.text.toLowerCase().includes('need more')) {
+      const clarification = await this.elicitationRequest({
+        prompt: "I need more details to help you better. Could you provide additional context?",
+        options: {
+          placeholder: "Please provide more details..."
+        }
+      });
+
+      // Generate final response with clarification
+      const finalResponse = await this.samplingRequest({
+        messages: [
+          {
+            role: "user",
+            content: {
+              type: "text",
+              text: `Original request: ${input.request}\nAdditional context: ${clarification.value}\nPlease provide a comprehensive response.`
+            }
+          }
+        ],
+        maxTokens: 1000
+      });
+
+      return finalResponse.content.text;
+    }
+
+    // If no clarification needed, respond directly
+    const directResponse = await this.samplingRequest({
+      messages: [
+        {
+          role: "user",
+          content: {
+            type: "text",
+            text: input.request
+          }
+        }
+      ],
+      maxTokens: 800
+    });
+
+    return directResponse.content.text;
+  }
+}
+```
+
+**Key Points:**
+- ✅ **Sampling requests** - Get AI-generated responses within your tools
+- ✅ **Elicitation requests** - Prompt users for interactive input
+- ✅ **Async/await support** - Both methods return promises
+- ✅ **Full MCP protocol** - Uses official MCP SDK types and methods
+- ✅ **Error handling** - Methods throw errors if server reference is not injected
+- ✅ **Request options** - Support for temperature, maxTokens, and other parameters
 
 ## Transport Configuration
 
